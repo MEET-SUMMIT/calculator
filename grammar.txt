@@ -1,0 +1,15 @@
+// a simple expression grammar:
+Expression:
+ Term
+ Expression "+" Term // addition
+ Expression "–" Term // subtraction
+Term:
+ Primary
+ Term "*" Primary // multiplication
+ Term "/" Primary // division
+ Term "%" Primary // remainder (modulo)
+Primary:
+ Number
+ "(" Expression ")" // grouping
+Number:
+ floating-point-literal
