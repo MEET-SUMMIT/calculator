@@ -52,8 +52,13 @@ double expression();
 int main()
 try {Token t={';'};
  while (t.kind==';')
- {  double value=expression();
-     cout <<"=" << value<< '\n';
+ {  cout<<">";
+ t=ts.get();
+ while(t.kind==';')t=ts.get();
+     if(t.kind=='q')
+     return 0;
+ ts.putback(t);
+     cout <<"=" << expression()<< '\n';
  t=ts.get();
 }
 }
