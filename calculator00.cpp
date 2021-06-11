@@ -1,21 +1,4 @@
-#include<iostream>
-#include<iomanip>
-#include<fstream>
-#include<sstream>
-#include<cmath>
-#include<cstdlib>
-#include<string>
-#include<list>
-#include <forward_list>
-#include<vector>
-#include<unordered_map>
-#include<algorithm>
-#include <array>
-#include <regex>
-#include<random>
-#include<stdexcept>
-#include<exception>
-#include<bits.h>
+#include ".\std_lib_facilities.h"
 using namespace std;
 class Token { // a very simple user-defined type
 public:
@@ -32,7 +15,7 @@ private:
 };
 void Token_stream::putback(Token t)
 {
- if (full) throw("putback() into a full buffer"); 
+ if (full) error("putback() into a full buffer"); 
  buffer = t; // copy t to buffer
  full = true; // buffer is now full
 }
@@ -58,7 +41,7 @@ Token Token_stream::get()
  return Token{'8',val}; // let ‘8’ represent “a number”
  }
  default:
- throw("Bad token");
+ error("Bad token");
  }
 }
 Token_stream ts; 
@@ -67,12 +50,15 @@ double primary();
 double term();
 double expression();
 int main()
-try {
- while (cin)
- cout << expression() << '\n';
+try {Token t={';'};
+ while (t.kind==';')
+ {  double value=expression();
+     cout <<"=" << value<< '\n';
+ t=ts.get();
+}
 }
 catch (exception& e) {
- cerr << e.what() << '\n';
+ cerr << e.what() << '\n'; 
  return 1;
 }
 catch (...) {
@@ -86,13 +72,13 @@ double primary()
  case '(': // handle ‘(‘ expression ‘)’
  { double d = expression();
  t =ts.get();
- if (t.kind != ')') throw("')' expected");
+ if (t.kind != ')') error("')' expected");
  return d;
  }
  case '8': // we use ‘8’ to represent a number
  return t.value; // return the number’s value
  default:
- throw("primary expected");
+ error("primary expected");
  }
 }
 double term()
@@ -107,7 +93,7 @@ double term()
  break;
  case '/':
  { double d = primary();
- if (d == 0) throw("divide by zero");
+ if (d == 0) error("divide by zero");
  left /= d;
  t = ts.get();
  break;
