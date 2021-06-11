@@ -9,7 +9,8 @@ Term:
  Term "/" Primary // division
  Term "%" Primary // remainder (modulo)
 Primary:
- Number
- "(" Expression ")" // grouping
+ Number "(" Expression ")"
+ "–" Primary
+ "+" Primary
 Number:
  floating-point-literal
