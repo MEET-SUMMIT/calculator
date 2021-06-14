@@ -1,4 +1,4 @@
-#include ".\std_lib_facilities.h"
+#include "./std_lib_facilities.h"
 using namespace std;
 class Token { // a very simple user-defined type
 public:
@@ -30,8 +30,8 @@ Token Token_stream::get()
  switch (ch) {
  case ';': // for “print”
  case 'q': // for “quit”
- case '(': case ')': case '+': case '-': case '*': case '/':
- return Token{ch}; // let each character represent itself
+  case '{': case '}': case '(': case ')': case '+': case '-': case '*': case '/': case'!':
+ return Token{ch}; //let each character represent itself
  case '.':
  case '0': case '1': case '2': case '3': case '4':
  case '5': case '6': case '7': case '8': case '9':
@@ -44,7 +44,14 @@ Token Token_stream::get()
  error("Bad token");
  }
 }
-Token_stream ts; 
+Token_stream ts;
+int factorial (int num){
+    if(num==0||num==1)
+    return 1;
+    else{
+    return num*factorial(num-1);
+    }
+} 
 double expression();
 double primary();
 double term();
@@ -74,15 +81,41 @@ double primary()
 {
  Token t = ts.get();
  switch (t.kind) {
+     case '{': // handle ‘{’ expression ‘}’
+ {
+ double d = expression();
+ t = ts.get();
+ if (t.kind != '}') error("'}' expected");
+ t=ts.get();
+ if(t.kind=='!')
+ return factorial(d);
+ else
+ {ts.putback(t);
+ return d;
+ }
+ }
  case '(': // handle ‘(’ expression ‘)’
  {
  double d = expression();
  t = ts.get();
  if (t.kind != ')') error("')' expected");
- return d;
+ t=ts.get();
+ if(t.kind=='!')
+ return factorial(d);
+ else
+ {ts.putback(t);
+ return d;}
  }
  case '8': // we use ‘8’ to represent a number
- return t.value; // return the number’s value
+{ int num=t.value;
+ t=ts.get();
+ if(t.kind=='!')
+ return factorial(num);
+ else{
+     ts.putback(t);
+ return num; 
+ }
+ } // return the number’s value
  case '-':
  return  -primary();
  case '+':
@@ -120,6 +153,10 @@ double expression()
  Token t = ts.get(); // get the next Token from the Token stream
  while (true) {
  switch (t.kind) {
+ /*case '!':
+ left=factorial(left);
+ t=ts.get();
+ break;*/
  case '+':
  left += term(); // evaluate Term and add
  t = ts.get();
