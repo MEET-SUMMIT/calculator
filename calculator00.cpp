@@ -45,12 +45,13 @@ Token Token_stream::get()
  }
 }
 Token_stream ts;
-int factorial (int num){
-    if(num==0||num==1)
+int factorial (double num){ //to find factorial of a number
+    if(num!=(int)num) error("integer expected as factorial argument");
+     if(num==0||num==1)
     return 1;
     else{
-    return num*factorial(num-1);
-    }
+    return num*factorial(num-1);  //recursive call of factorial
+    } 
 } 
 double expression();
 double primary();
@@ -87,7 +88,7 @@ double primary()
  t = ts.get();
  if (t.kind != '}') error("'}' expected");
  t=ts.get();
- if(t.kind=='!')
+ if(t.kind=='!') //factorial '1' will be either after number or braces
  return factorial(d);
  else
  {ts.putback(t);
@@ -107,7 +108,7 @@ double primary()
  return d;}
  }
  case '8': // we use ‘8’ to represent a number
-{ int num=t.value;
+{ double num=t.value;
  t=ts.get();
  if(t.kind=='!')
  return factorial(num);
@@ -153,10 +154,6 @@ double expression()
  Token t = ts.get(); // get the next Token from the Token stream
  while (true) {
  switch (t.kind) {
- /*case '!':
- left=factorial(left);
- t=ts.get();
- break;*/
  case '+':
  left += term(); // evaluate Term and add
  t = ts.get();
