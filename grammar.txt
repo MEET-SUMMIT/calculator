@@ -9,7 +9,8 @@ Term:
  Term "/" Primary // division
  Term "%" Primary // remainder (modulo)
 Primary:
- Number "(" Expression ")"
+ Number "(" Expression ")" "{" Expression "}"
+ Number! "("Expression")"! "{" Expression "}"!
  "–" Primary
  "+" Primary
 Number:

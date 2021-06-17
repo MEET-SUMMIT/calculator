@@ -30,7 +30,7 @@ Token Token_stream::get()
  switch (ch) {
  case ';': // for “print”
  case 'q': // for “quit”
-  case '{': case '}': case '(': case ')': case '+': case '-': case '*': case '/': case'!':
+  case '{': case '}': case '(': case ')': case '+': case '-': case '*': case '/': case '%': case'!':
  return Token{ch}; //let each character represent itself
  case '.':
  case '0': case '1': case '2': case '3': case '4':
@@ -142,6 +142,14 @@ double term()
  t = ts.get();
  break;
  }
+ case '%':                      //modulus:only defined for integers
+{ int i1 = narrow_cast<int>(left);
+ int i2 = narrow_cast<int>(primary());
+ if (i2 == 0) error("%: divide by zero");
+ left = i1%i2;
+ t = ts.get();
+ break;
+}
  default:
  ts.putback(t); // put t back into the Token stream
  return left;
