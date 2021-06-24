@@ -1,5 +1,10 @@
 #include "./std_lib_facilities.h"
 using namespace std;
+const char number='8';
+const char print=';';
+const char quit='q';
+const string prompt = "> ";
+const string result = "= "; 
 class Token { // a very simple user-defined type
 public:
  char kind;
@@ -28,8 +33,8 @@ Token Token_stream::get()
  char ch;
  cin >> ch; 
  switch (ch) {
- case ';': // for “print”
- case 'q': // for “quit”
+ case print:
+ case quit:
   case '{': case '}': case '(': case ')': case '+': case '-': case '*': case '/': case '%': case'!':
  return Token{ch}; //let each character represent itself
  case '.':
@@ -38,7 +43,7 @@ Token Token_stream::get()
  { cin.putback(ch); // put digit back into the input stream
  double val;
  cin >> val; // read a floating-point number
- return Token{'8',val}; // let ‘8’ represent “a number”
+ return Token{number,val}; //“a number”
  }
  default:
  error("Bad token");
@@ -58,15 +63,15 @@ double primary();
 double term();
 double expression();
 int main()
-try {Token t={';'};
- while (t.kind==';')
- {  cout<<">";
+try {Token t={print};
+ while (t.kind==print)
+ {  cout<<prompt;
  t=ts.get();
- while(t.kind==';')t=ts.get();
-     if(t.kind=='q')
+ while(t.kind==print)t=ts.get();
+     if(t.kind==quit)
      return 0;
  ts.putback(t);
-     cout <<"=" << expression()<< '\n';
+     cout <<result << expression()<< '\n';
  t=ts.get();
 }
 }
@@ -107,7 +112,7 @@ double primary()
  {ts.putback(t);
  return d;}
  }
- case '8': // we use ‘8’ to represent a number
+ case number:
 { double num=t.value;
  t=ts.get();
  if(t.kind=='!')
