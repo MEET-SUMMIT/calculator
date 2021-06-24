@@ -35,7 +35,16 @@ Token Token_stream::get()
  switch (ch) {
  case print:
  case quit:
-  case '{': case '}': case '(': case ')': case '+': case '-': case '*': case '/': case '%': case'!':
+  case '{': 
+  case '}': 
+  case '(': 
+  case ')': 
+  case '+': 
+  case '-': 
+  case '*': 
+  case '/': 
+  case '%': 
+  case '!':
  return Token{ch}; //let each character represent itself
  case '.':
  case '0': case '1': case '2': case '3': case '4':
@@ -58,22 +67,15 @@ int factorial (double num){ //to find factorial of a number
     return num*factorial(num-1);  //recursive call of factorial
     } 
 } 
+void calculate();
 double expression();
 double primary();
 double term();
 double expression();
 int main()
-try {Token t={print};
- while (t.kind==print)
- {  cout<<prompt;
- t=ts.get();
- while(t.kind==print)t=ts.get();
-     if(t.kind==quit)
-     return 0;
- ts.putback(t);
-     cout <<result << expression()<< '\n';
- t=ts.get();
-}
+try {
+    calculate();
+    return 0;
 }
 catch (exception& e) {
  cerr << e.what() << '\n'; 
@@ -180,4 +182,17 @@ double expression()
  return left; // finally: no more + or –; return the answer
  }
  }
+}
+void calculate(){
+    Token t={print};
+ while (t.kind==print)
+ {  cout<<prompt;
+ t=ts.get();
+ while(t.kind==print)t=ts.get();
+     if(t.kind==quit)
+     return;
+ ts.putback(t);
+     cout <<result << expression()<< '\n';
+ t=ts.get();
+    }
 }
