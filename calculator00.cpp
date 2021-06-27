@@ -4,11 +4,22 @@ const char number='8';
 const char print=';';
 const char quit='q';
 const string prompt = "> ";
-const string result = "= "; 
-class Token { // a very simple user-defined type
+const string result = "= ";
+class Variable {
+public:
+ string name;
+ double value;
+}; 
+class Token {
 public:
  char kind;
  double value;
+ string name;
+ Token(char ch) :kind{ch} { } // initialize kind with ch
+ Token(char ch, double val) :kind{ch}, value{val} { } // initialize kind
+ // and value
+ Token(char ch, string n) :kind{ch}, name{n} { } // initialize kind
+ // and name
 };
 class Token_stream {
 public:
@@ -39,6 +50,9 @@ void Token_stream::putback(Token t)
  buffer = t; // copy t to buffer
  full = true; // buffer is now full
 }
+const char name = 'a'; // name token
+const char let = 'L'; // declaration token
+const string declkey = "let"; // declaration keyword
 Token Token_stream::get()
 {
  if (full) { // do we already have a Token ready?
@@ -70,6 +84,13 @@ Token Token_stream::get()
  return Token{number,val}; //“a number”
  }
  default:
+ if (isalpha(ch)) {
+ cin.putback(ch);
+ string s;
+ cin>>s;
+ if (s == declkey) return Token(let); // declaration keyword
+ return Token{name,s};
+ }
  error("Bad token");
  }
 }
@@ -82,9 +103,66 @@ int factorial (double num){ //to find factorial of a number
     return num*factorial(num-1);  //recursive call of factorial
     } 
 } 
+vector<Variable> var_table;
+double get_value(string s)
+ // return the value of the Variable named s
+{
+ for (const Variable& v : var_table)
+ if (v.name == s) return v.value;
+ error("get: undefined variable ", s);
+}
+bool is_declared(string var)
+ // is var already in var_table?
+{
+ for (const Variable& v : var_table)
+ if (v.name == var) return true;
+ return false;
+}
+double define_name(string var, double val)
+ // add (var,val) to var_table
+{
+ if (is_declared(var)) error(var," declared twice");
+ var_table.push_back(Variable(var,val));
+ return val;
+}
+void set_value(string s, double d)
+ // set the Variable named s to d
+{
+ for (Variable& v : var_table)
+ if (v.name == s) {
+ v.value = d;
+ return;
+ }
+ error("set: undefined variable ", s);
+}
+double expression();
+double declaration()
+ // assume we have seen "let”
+ // handle: name = expression
+ // declare a variable called "name” with the initial value "expression”
+{
+ Token t = ts.get();
+ if (t.kind != name) error ("name expected in declaration");
+ string var_name = t.name;
+ Token t2 = ts.get();
+ if (t2.kind != '=') error("= missing in declaration of ", var_name);
+ double d = expression();
+ define_name(var_name,d);
+ return d;
+}
+double statement()
+{
+ Token t = ts.get();
+ switch (t.kind) {
+ case let:
+ return declaration();
+ default:
+ ts.putback(t);
+ return expression();
+ }
+}
 void clean_up_mess();
 void calculate();
-double expression();
 double primary();
 double term();
 double expression();
@@ -204,7 +282,7 @@ void calculate(){
      if(t.kind==quit)
      return;
  ts.putback(t);
-     cout <<result << expression()<< '\n';
+     cout <<result << statement()<< '\n';
  t=ts.get();
 }
 catch (exception& e) {
