@@ -244,6 +244,16 @@ double primary()
  return  -primary();
  case '+':
  return primary();
+ case name:
+ { double num=get_value(t.name);
+ t=ts.get();
+ if(t.kind=='!')
+ return factorial(num);
+ else{
+     ts.putback(t);
+ return num; 
+ }
+ } // return the variable’s value
 default:
  error("primary expected");
  }
