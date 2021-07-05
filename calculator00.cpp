@@ -5,22 +5,28 @@ const char print=';';
 const char quit='q';
 const string prompt = "> ";
 const string result = "= ";
-class Variable {
+
+class Variable {    //made a class to store variables name with values
 public:
- string name;
+ string name;       
  double value;
+ Variable(string var,double val):name{var},value{val} { }   //constructor
 }; 
+
 class Token {
 public:
  char kind;
  double value;
  string name;
+ Token() { }
  Token(char ch) :kind{ch} { } // initialize kind with ch
  Token(char ch, double val) :kind{ch}, value{val} { } // initialize kind
  // and value
  Token(char ch, string n) :kind{ch}, name{n} { } // initialize kind
  // and name
 };
+
+
 class Token_stream {
 public:
  Token get(); // get a Token 
@@ -29,7 +35,9 @@ public:
 private:
  bool full {false}; // is there a Token in the buffer?
  Token buffer; // here is where we keep a Token put back using putback()
-};
+} ts;
+
+
 void Token_stream::ignore(char c)
  // c represents the kind of Token
 {
@@ -44,15 +52,21 @@ void Token_stream::ignore(char c)
  while (cin>>ch)
  if (ch==c) return;
 }
+
+
 void Token_stream::putback(Token t)
 {
  if (full) error("putback() into a full buffer"); 
  buffer = t; // copy t to buffer
  full = true; // buffer is now full
 }
+
+
 const char name = 'a'; // name token
 const char let = 'L'; // declaration token
 const string declkey = "let"; // declaration keyword
+
+
 Token Token_stream::get()
 {
  if (full) { // do we already have a Token ready?
@@ -64,6 +78,7 @@ Token Token_stream::get()
  switch (ch) {
  case print:
  case quit:
+  case '=':
   case '{': 
   case '}': 
   case '(': 
@@ -85,16 +100,18 @@ Token Token_stream::get()
  }
  default:
  if (isalpha(ch)) {
- cin.putback(ch);
  string s;
- cin>>s;
- if (s == declkey) return Token(let); // declaration keyword
+ s += ch;
+ while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s+=ch;
+ cin.putback(ch);
+ if (s == declkey) return Token{let}; // declaration keyword
  return Token{name,s};
  }
  error("Bad token");
- }
 }
-Token_stream ts;
+}
+
+
 int factorial (double num){ //to find factorial of a number
     if(num!=(int)num) error("integer expected as factorial argument");
      if(num==0||num==1)
@@ -102,7 +119,9 @@ int factorial (double num){ //to find factorial of a number
     else{
     return num*factorial(num-1);  //recursive call of factorial
     } 
-} 
+}
+
+
 vector<Variable> var_table;
 double get_value(string s)
  // return the value of the Variable named s
@@ -111,6 +130,7 @@ double get_value(string s)
  if (v.name == s) return v.value;
  error("get: undefined variable ", s);
 }
+
 bool is_declared(string var)
  // is var already in var_table?
 {
@@ -118,6 +138,7 @@ bool is_declared(string var)
  if (v.name == var) return true;
  return false;
 }
+
 double define_name(string var, double val)
  // add (var,val) to var_table
 {
@@ -125,6 +146,7 @@ double define_name(string var, double val)
  var_table.push_back(Variable(var,val));
  return val;
 }
+
 void set_value(string s, double d)
  // set the Variable named s to d
 {
@@ -135,6 +157,7 @@ void set_value(string s, double d)
  }
  error("set: undefined variable ", s);
 }
+
 double expression();
 double declaration()
  // assume we have seen "let”
@@ -150,6 +173,7 @@ double declaration()
  define_name(var_name,d);
  return d;
 }
+
 double statement()
 {
  Token t = ts.get();
@@ -161,6 +185,7 @@ double statement()
  return expression();
  }
 }
+
 void clean_up_mess();
 void calculate();
 double primary();
@@ -175,6 +200,7 @@ catch (...) {
  cerr << "exception \n";
  return 1;
 }
+
 double primary()
 {
  Token t = ts.get();
@@ -222,6 +248,7 @@ default:
  error("primary expected");
  }
 }
+
 double term()
 {
  double left = primary();
@@ -253,6 +280,7 @@ double term()
  }
  }
 }
+
 double expression()
 {
  double left = term(); // read and evaluate a Term
@@ -273,6 +301,7 @@ double expression()
  }
  }
 }
+
 void calculate(){
  while (cin)
  try{ 
