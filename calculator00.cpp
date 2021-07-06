@@ -6,6 +6,7 @@ const char quit='q';
 const string prompt = "> ";
 const string result = "= ";
 const char sqroot = 's';
+const char power ='p';
 
 class Variable {    //made a class to store variables name with values
 public:
@@ -89,6 +90,7 @@ Token Token_stream::get()
   case '/': 
   case '%': 
   case '!':
+  case ',':
  return Token{ch}; //let each character represent itself
  case '.':
  case '0': case '1': case '2': case '3': case '4':
@@ -106,6 +108,7 @@ Token Token_stream::get()
  cin.putback(ch);
  if (s == declkey) return Token{let}; // declaration keyword
  else if(s=="sqrt") return Token{sqroot};
+ else if(s=="pow") return Token{power};
  else
  return Token{name,s};
  }
@@ -261,7 +264,7 @@ double primary()
  if(t.kind!='(') error("'(' expected after sqrt");
      double num=expression();
      t=ts.get();
-     if (t.kind != ')') error("')' expected");
+     if (t.kind != ')') error("')' expected in sqrt");
     if(!(num>=0)) error("negative input in sqrt");
     num=sqrt(num);
  t=ts.get();
@@ -270,6 +273,23 @@ double primary()
  else
  {ts.putback(t);
  return num;}
+ }
+ case power:
+ {t=ts.get();
+    if(t.kind!='(') error("'(' expected after pow");
+ double base=expression();
+ t=ts.get();
+    if(t.kind!=',')error("a ',' is expected to separate base and exp in pow");
+ double exp=narrow_cast<int>(expression());
+  t=ts.get();
+     if (t.kind != ')') error("')' expected in pow");
+     base=pow(base,exp);
+     t=ts.get();
+ if(t.kind=='!')
+ return factorial(base);
+ else
+ {ts.putback(t);
+ return base;}
  }
 default:
  error("primary expected");
