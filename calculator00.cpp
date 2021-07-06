@@ -5,6 +5,7 @@ const char print=';';
 const char quit='q';
 const string prompt = "> ";
 const string result = "= ";
+const char sqroot = 's';
 
 class Variable {    //made a class to store variables name with values
 public:
@@ -66,7 +67,6 @@ const char name = 'a'; // name token
 const char let = 'L'; // declaration token
 const string declkey = "let"; // declaration keyword
 
-
 Token Token_stream::get()
 {
  if (full) { // do we already have a Token ready?
@@ -105,6 +105,8 @@ Token Token_stream::get()
  while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s+=ch;
  cin.putback(ch);
  if (s == declkey) return Token{let}; // declaration keyword
+ else if(s=="sqrt") return Token{sqroot};
+ else
  return Token{name,s};
  }
  error("Bad token");
@@ -254,6 +256,21 @@ double primary()
  return num; 
  }
  } // return the variable’s value
+ case sqroot:
+ { t=ts.get();
+ if(t.kind!='(') error("'(' expected after sqrt");
+     double num=expression();
+     t=ts.get();
+     if (t.kind != ')') error("')' expected");
+    if(!(num>=0)) error("negative input in sqrt");
+    num=sqrt(num);
+ t=ts.get();
+ if(t.kind=='!')
+ return factorial(num);
+ else
+ {ts.putback(t);
+ return num;}
+ }
 default:
  error("primary expected");
  }
